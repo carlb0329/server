@@ -3,7 +3,7 @@ require_once("module.php");
 
 class Editors extends Module
 {
-    public function getToken($username, $password, $permission)
+    public static function getToken($username, $password, $permission)
     {
         $username   = addslashes($username);
         $password   = addslashes($password);

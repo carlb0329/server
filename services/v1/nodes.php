@@ -17,7 +17,7 @@ class Nodes extends Module
 
     }
 
-    public function getNode($gameId, $intNodeId)
+    public static function getNode($gameId, $intNodeId)
     {
         $query = "SELECT * FROM nodes WHERE game_id = {$gameId} AND node_id = {$intNodeId} LIMIT 1";
 
@@ -104,7 +104,7 @@ class Nodes extends Module
         else return new returnData(0, FALSE, "Success Running:" . $query);
     }
 
-    public function deleteNodesReferencedByObject($gameId, $type, $intNpcId)
+    public static function deleteNodesReferencedByObject($gameId, $type, $intNpcId)
     {
         $query = "SELECT node_id FROM npc_conversations WHERE game_id = {$gameId} AND npc_id = {$intNpcId}";
         $result = Module::query($query);
@@ -116,7 +116,7 @@ class Nodes extends Module
         return new returnData(0);
     }
 
-    public function deleteNode($gameId, $intNodeId)
+    public static function deleteNode($gameId, $intNodeId)
     {
         Locations::deleteLocationsForObject($gameId, 'Node', $intNodeId);
         Requirements::deleteRequirementsForRequirementObject($gameId, 'Node', $intNodeId);

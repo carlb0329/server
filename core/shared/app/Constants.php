@@ -8,6 +8,8 @@
  * @subpackage app
  */
 
+date_default_timezone_set("UTC");
+
 /**
  * The Service browser header
  */

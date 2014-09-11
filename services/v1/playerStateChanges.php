@@ -107,7 +107,7 @@ class PlayerStateChanges extends Module
 
     }
 
-    public function deletePlayerStateChangesThatRefrenceObject($gameId, $strObjectType, $intObjectId)
+    public static function deletePlayerStateChangesThatRefrenceObject($gameId, $strObjectType, $intObjectId)
     {
         $whereClause = '';
 
@@ -153,7 +153,7 @@ class PlayerStateChanges extends Module
         return new returnData(0, $options);	
     }
 
-    private function lookupEventTypeOptionsFromSQL()
+    private static function lookupEventTypeOptionsFromSQL()
     {
         $query = "SHOW COLUMNS FROM player_state_changes LIKE 'event_type'";
 
@@ -165,7 +165,7 @@ class PlayerStateChanges extends Module
         return( $enum_fields );
     }
 
-    private function lookupActionTypeOptionsFromSQL()
+    private static function lookupActionTypeOptionsFromSQL()
     {
         $query = "SHOW COLUMNS FROM player_state_changes LIKE 'action'";
         $result = Module::query( $query );

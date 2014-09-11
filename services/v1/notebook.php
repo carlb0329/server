@@ -5,7 +5,7 @@ require_once("locations.php");
 
 class Notebook extends Module
 {
-    public function createNote($gameId, $playerId)
+    public static function createNote($gameId, $playerId)
     {
         Module::query("INSERT INTO notes (game_id, owner_id) VALUES ('{$gameId}', '{$playerId}')");
         $id = mysql_insert_id();
@@ -13,7 +13,7 @@ class Notebook extends Module
         return new returnData(0, $id);
     }
 
-    public function updateNote($noteId, $title, $publicToMap, $publicToNotebook, $lat, $lon)
+    public static function updateNote($noteId, $title, $publicToMap, $publicToNotebook, $lat, $lon)
     {
         $title = addslashes($title);
         Module::query("UPDATE notes SET title = '{$title}', public_to_map = '{$publicToMap}', public_to_notebook = '{$publicToNotebook}' WHERE note_id = '{$noteId}'");
@@ -26,7 +26,7 @@ class Notebook extends Module
         return new returnData(0);
     }
 
-    public function addContentToNote($noteId,  $mediaId, $type, $title='')
+    public static function addContentToNote($noteId,  $mediaId, $type, $title='')
     {
         if($title == '') $title = Date('F jS Y h:i:s A');
         else $title = addslashes($title);
@@ -68,7 +68,7 @@ class Notebook extends Module
         return new returnData(0, NULL);	
     }
 
-    private function getNotesVisibleToGame($gameId, $full = false, $page = 0, $psize = 20) 
+    private static function getNotesVisibleToGame($gameId, $full = false, $page = 0, $psize = 20) 
     {
         $noteIds = Module::queryArray("SELECT note_id FROM notes WHERE game_id = '{$gameId}' AND parent_note_id = '0' AND (public_to_notebook = '1' OR public_to_map = '1') LIMIT ".($page*$psize).",".$psize);
 
@@ -92,7 +92,7 @@ class Notebook extends Module
         return new returnData(0, Notebook::getNotesVisibleToGame($gameId,false,$page,$psize));
     }
 
-    private function getNotesVisibleToPlayer($gameId, $playerId, $full = false, $page = 0, $psize = 20)
+    private static function getNotesVisibleToPlayer($gameId, $playerId, $full = false, $page = 0, $psize = 20)
     {
         $noteIds = Module::queryArray("SELECT note_id FROM notes WHERE game_id = '{$gameId}' AND parent_note_id = 0 AND (owner_id = '{$playerId}' OR public_to_notebook = '1' OR public_to_map = '1') LIMIT ".($page*$psize).",".$psize);
 
@@ -123,7 +123,7 @@ class Notebook extends Module
         else      return new returnData(1, $note);
     }
 
-    private function getFullNoteObject($noteId)
+    private static function getFullNoteObject($noteId)
     {
         $note = Module::queryObject("SELECT * FROM notes WHERE note_id = '{$noteId}'");
         if(!$note) return null;
@@ -153,7 +153,7 @@ class Notebook extends Module
         return $fullNote;
     }
 
-    private function getStubNoteObject($noteId)
+    private static function getStubNoteObject($noteId)
     {
         $note = Module::queryObject("SELECT * FROM notes WHERE note_id = '{$noteId}'");
         $player = Module::queryObject("SELECT * FROM players WHERE player_id = '{$note->owner_id}'");
@@ -174,7 +174,7 @@ class Notebook extends Module
         return $stubNote;
     }
 
-    private function getNoteContents($noteId)
+    private static function getNoteContents($noteId)
     {
         $contentIds = Module::queryArray("SELECT * FROM note_content WHERE note_id = '{$noteId}'");
 
@@ -201,7 +201,7 @@ class Notebook extends Module
         return $contents;
     }
 
-    private function getNoteComments($noteId)
+    private static function getNoteComments($noteId)
     {
         $commentIds = Module::queryArray("SELECT * FROM notes WHERE parent_note_id = '{$noteId}'");
 
@@ -226,13 +226,13 @@ class Notebook extends Module
         return $comments;
     }
 
-    private function getNoteTags($noteId, $gameId)
+    private static function getNoteTags($noteId, $gameId)
     {
         $tags = Module::queryArray("SELECT gt.tag, gt.tag_id, gt.player_created, gt.media_id FROM note_tags LEFT JOIN ((SELECT tag, tag_id, player_created, media_id FROM game_tags WHERE game_id = '{$gameId}') as gt) ON note_tags.tag_id = gt.tag_id WHERE note_id = '{$noteId}'");
         return $tags;
     }
 
-    private function getNoteLikes($noteId)
+    private static function getNoteLikes($noteId)
     {
         $likes = Module::queryArray("SELECT * FROM note_likes WHERE note_id = '{$noteId}'");
         return $likes;
@@ -244,7 +244,7 @@ class Notebook extends Module
         return new returnData(0,$tags);
     }
 
-    public function deleteNote($noteId)
+    public static function deleteNote($noteId)
     {
         if($noteId == 0) return new returnData(0);//if 0, it would delete ALL notes
 
@@ -267,7 +267,7 @@ class Notebook extends Module
         return new returnData(0);
     }
 
-    public function addTagToNote($noteId, $tag)
+    public static function addTagToNote($noteId, $tag)
     {
         $note = Module::queryObject("SELECT * FROM notes WHERE note_id = '{$noteId}'");
         $id = Module::queryObject("SELECT tag_id FROM game_tags WHERE game_id = '{$note->game_id}' AND tag = '{$tag}' LIMIT 1");
@@ -286,7 +286,7 @@ class Notebook extends Module
         return new returnData(0, $id->tag_id);
     }
 
-    public function deleteTagFromNote($noteId, $tagId)
+    public static function deleteTagFromNote($noteId, $tagId)
     {
         Module::query("DELETE FROM note_tags WHERE note_id = '{$noteId}' AND tag_id = '{$tagId}'");
 

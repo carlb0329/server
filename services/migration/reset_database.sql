@@ -1,6 +1,8 @@
 /*
 CREATE THE DATABASE
 */
+
+/*
 DROP USER 'migration_user'@'127.0.0.1';
 CREATE USER 'migration_user'@'127.0.0.1' IDENTIFIED BY 'migration_pass';
 DROP DATABASE IF EXISTS migration_db;
@@ -22,4 +24,4 @@ CREATE TABLE game_migrations (
 v2_game_id INT(32) UNSIGNED NOT NULL PRIMARY KEY,
 v1_game_id INT(32) UNSIGNED NOT NULL
 );
-
+*/

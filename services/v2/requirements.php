@@ -410,8 +410,6 @@ class requirements extends dbconnection
         $atom = dbconnection::queryObject("SELECT * FROM requirement_atoms WHERE requirement_atom_id = '{$pack->requirement_atom_id}'");
         if(!$atom) return false;
         $atom->user_id = $pack->user_id;
-        if($atom->bool_operator == 0) $atom->bool_operator = false;
-        if($atom->bool_operator == 1) $atom->bool_operator = true;
 
         //these functions need to be defined for new schema
         switch($atom->requirement)
@@ -443,51 +441,51 @@ class requirements extends dbconnection
     private function playerHasItem($pack)
     {
         $item = dbconnection::queryObject("SELECT * FROM instances WHERE game_id = '{$pack->game_id}' AND owner_id = '{$pack->user_id}' AND object_type = 'ITEM' AND object_id = '{$pack->content_id}' AND qty >= '{$pack->qty}'");
-        return $item ? true : false;
+        return $item ? $pack->bool_operator : !$pack->bool_operator;
     }
     private function playerHasTaggedItem($pack)
     {
         //NOT DONE!!
         $item = dbconnection::queryObject("SELECT * FROM instances WHERE game_id = '{$pack->game_id}' AND owner_id = '{$pack->user_id}' AND object_type = 'ITEM' AND object_id = '{$pack->content_id}' AND qty >= '{$pack->qty}'");
-        return $item ? true : false;
+        return $item ? $pack->bool_operator : !$pack->bool_operator;
     }
     private function playerViewed($pack,$type)
     {
         $entry = dbconnection::queryObject("SELECT * FROM user_log WHERE game_id = '{$pack->game_id}' AND user_id = '{$pack->user_id}' AND event_type = 'VIEW_{$type}' AND content_id = '{$pack->content_id}' AND deleted = 0");
-        return $entry ? true : false;
+        return $entry ? $pack->bool_operator : !$pack->bool_operator;
     }
     private function playerUploaded($pack,$type)
     {
-        return false;
+        return $pack->bool_operator;
     }
     private function playerCompletedQuest($pack)
     {
         $entry = dbconnection::queryObject("SELECT * FROM user_log WHERE game_id = '{$pack->game_id}' AND user_id = '{$pack->user_id}' AND event_type = 'COMPLETE_QUEST' AND content_id = '{$pack->content_id}' AND deleted = 0");
-        return $entry ? true : false;
+        return $entry ? $pack->bool_operator : !$pack->bool_operator;
     }
     private function playerReceivedWebHook($pack)
     {
-        return false;
+        return $pack->bool_operator;
     }
     private function playerHasNote($pack)
     {
-        return false;
+        return $pack->bool_operator;
     }
     private function playerHasNoteWithTag($pack)
     {
-        return false;
+        return $pack->bool_operator;
     }
     private function playerHasNoteWithLikes($pack)
     {
-        return false;
+        return $pack->bool_operator;
     }
     private function playerHasNoteWithComments($pack)
     {
-        return false;
+        return $pack->bool_operator;
     }
     private function playerHasGivenNoteComments($pack)
     {
-        return false;
+        return $pack->bool_operator;
     }
 }
 ?>

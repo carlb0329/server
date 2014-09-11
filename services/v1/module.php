@@ -94,7 +94,7 @@ abstract class Module extends Utils
         Utils::connect();
     }	
 
-    protected function authenticateEditor($editorId, $token, $permissionReq)
+    protected static function authenticateEditor($editorId, $token, $permissionReq)
     {
         $permissionReq = addslashes($permissionReq);
         $token         = addslashes($token);
@@ -107,7 +107,7 @@ abstract class Module extends Utils
         return false;
     }
 
-    protected function authenticateGameEditor($gameId, $editorId, $token, $permissionReq)
+    protected static function authenticateGameEditor($gameId, $editorId, $token, $permissionReq)
     {
         $permissionReq = addslashes($permissionReq);
         $token         = addslashes($token);
@@ -120,7 +120,7 @@ abstract class Module extends Utils
         return false;
     }
 
-    protected function giveItemToPlayer($gameId, $itemId, $playerId, $qtyToGive=1)
+    protected static function giveItemToPlayer($gameId, $itemId, $playerId, $qtyToGive=1)
     {
         $currentQty = Module::itemQtyInPlayerInventory($gameId, $playerId, $itemId);
         $item = Items::getItem($gameId, $itemId)->data;
@@ -143,13 +143,13 @@ abstract class Module extends Utils
         }
     }
 
-    protected function getPlayerCountForGame($gameId)
+    protected static function getPlayerCountForGame($gameId)
     {
         $countObj = Module::queryObject("SELECT COUNT(DISTINCT player_id) AS count FROM player_log WHERE game_id = $gameId AND timestamp BETWEEN DATE_SUB(NOW(), INTERVAL 20 MINUTE) AND NOW()");
         return new returnData(0, $countObj);
     }
 
-    protected function setItemCountForPlayer($gameId, $intItemId, $playerId, $qty)
+    protected static function setItemCountForPlayer($gameId, $intItemId, $playerId, $qty)
     {
         $currentQty = Module::itemQtyInPlayerInventory($gameId, $playerId, $intItemId);
         $item = Items::getItem($gameId, $intItemId)->data;
@@ -167,17 +167,17 @@ abstract class Module extends Utils
         }
     }
 
-    protected function takeItemFromPlayer($gameId, $intItemId, $playerId, $qtyToTake=1)
+    protected static function takeItemFromPlayer($gameId, $intItemId, $playerId, $qtyToTake=1)
     {
         Module::adjustQtyForPlayerItem($gameId, $intItemId, $playerId, -$qtyToTake);
     }
 
-    protected function removeItemFromAllPlayerInventories($gameId, $intItemId)
+    protected static function removeItemFromAllPlayerInventories($gameId, $intItemId)
     {
         Module::query("DELETE FROM player_items WHERE item_id = {$intItemId} AND game_id = '{$gameId}'");
     }
 
-    protected function adjustQtyForPlayerItem($gameId, $intItemId, $playerId, $amountOfAdjustment)
+    protected static function adjustQtyForPlayerItem($gameId, $intItemId, $playerId, $amountOfAdjustment)
     {
         //Get any existing record
         $result = Module::query("SELECT * FROM player_items WHERE player_id = $playerId AND item_id = $intItemId AND game_id = '{$gameId}' LIMIT 1");
@@ -219,7 +219,7 @@ abstract class Module extends Utils
         Module::query($query);    	
     }
 
-    protected function giveNoteToWorld($gameId, $noteId, $floatLat, $floatLong)
+    protected static function giveNoteToWorld($gameId, $noteId, $floatLat, $floatLong)
     {
         $query = "SELECT * FROM locations WHERE type = 'PlayerNote' AND type_id = '{$noteId}' AND game_id = '{$gameId}'";	
         $result = Module::query($query);
@@ -283,7 +283,7 @@ abstract class Module extends Utils
         }
     }
 
-    protected function metersBetweenLatLngs($lat1, $lon1, $lat2, $lon2)
+    protected static function metersBetweenLatLngs($lat1, $lon1, $lat2, $lon2)
     { 
         $theta = $lon1 - $lon2; 
         $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta)); 
@@ -294,7 +294,7 @@ abstract class Module extends Utils
         return ($miles * 1609.344); //convert to meters
     }
 
-    protected function randomLatLnWithinRadius($originLat, $originLon, $minDistTrueScale, $maxDistTrueScale)
+    protected static function randomLatLnWithinRadius($originLat, $originLon, $minDistTrueScale, $maxDistTrueScale)
     {
         $radius = ((rand(0,1000)/1000)*($maxDistTrueScale-$minDistTrueScale)) + $minDistTrueScale;
         $xDelt = rand(-1000,1000)/1000;
@@ -310,7 +310,7 @@ abstract class Module extends Utils
         return $locObj;
     }
 
-    protected function playerHasLog($gameId, $playerId, $strEventType, $strEventDetail)
+    protected static function playerHasLog($gameId, $playerId, $strEventType, $strEventDetail)
     {
         $query = "SELECT 1 FROM player_log 
             WHERE player_id = '{$playerId}' AND
@@ -325,7 +325,7 @@ abstract class Module extends Utils
         else return false;	
     }
 
-    protected function playerHasItem($gameId, $playerId, $itemId, $minItemQuantity)
+    protected static function playerHasItem($gameId, $playerId, $itemId, $minItemQuantity)
     {
         if (!$minItemQuantity) $minItemQuantity = 1;
         $qty = Module::itemQtyInPlayerInventory($gameId, $playerId, $itemId);
@@ -333,7 +333,7 @@ abstract class Module extends Utils
         else return false;
     }		
 
-    protected function playerHasTaggedItem($gameId, $playerId, $tagId, $minItemQuantity)
+    protected static function playerHasTaggedItem($gameId, $playerId, $tagId, $minItemQuantity)
     {
         if (!$minItemQuantity) $minItemQuantity = 1;
         $qty = Module::itemTagQtyInPlayerInventory($gameId, $playerId, $tagId);
@@ -341,7 +341,7 @@ abstract class Module extends Utils
         else return false;
     }		
 
-    protected function itemQtyInPlayerInventory($gameId, $playerId, $itemId)
+    protected static function itemQtyInPlayerInventory($gameId, $playerId, $itemId)
     {
         $query = "SELECT qty FROM player_items 
             WHERE player_id = '{$playerId}' 
@@ -354,7 +354,7 @@ abstract class Module extends Utils
         else             return 0;
     }	    
 
-    protected function itemTagQtyInPlayerInventory($gameId, $playerId, $tagId)
+    protected static function itemTagQtyInPlayerInventory($gameId, $playerId, $tagId)
     {
         $query = "SELECT object_id FROM object_tags WHERE tag_id = '{$tagId}' AND object_type = 'ITEM'";
         $result = Module::query($query);
@@ -364,7 +364,7 @@ abstract class Module extends Utils
         return $qty;
     }	    
 
-    protected function playerHasUploadedMediaItemWithinDistance($gameId, $playerId, $dblLatitude, $dblLongitude, $dblDistanceInMeters, $qty, $mediaType) 
+    protected static function playerHasUploadedMediaItemWithinDistance($gameId, $playerId, $dblLatitude, $dblLongitude, $dblDistanceInMeters, $qty, $mediaType) 
     {
         if($dblLatitude == "" || $dblLongitude == "" || $dblDistanceInMeters == "") return false; //MySQL Math segment freaks out if there is nothing in them ('0' is ok)
         $query = "SELECT game_items.*
@@ -400,7 +400,7 @@ abstract class Module extends Utils
         else return false;
     }	    
 
-    protected function playerHasNote($gameId, $playerId, $qty)
+    protected static function playerHasNote($gameId, $playerId, $qty)
     {
         $query = "SELECT note_id FROM notes WHERE game_id = '{$gameId}' AND owner_id = '{$playerId}' AND parent_note_id = 0 AND incomplete = '0'";
         $result = Module::query($query);
@@ -408,7 +408,7 @@ abstract class Module extends Utils
         return false;
     }
 
-    protected function playerHasNoteWithTag($gameId, $playerId, $tag, $qty)
+    protected static function playerHasNoteWithTag($gameId, $playerId, $tag, $qty)
     {
         $query = "SELECT note_id FROM notes WHERE game_id = '{$gameId}' AND owner_id = '{$playerId}' AND parent_note_id = 0 AND incomplete = '0'";
         $result = Module::query($query);
@@ -425,7 +425,7 @@ abstract class Module extends Utils
             return false;
     }
 
-    protected function playerHasNoteWithComments($gameId, $playerId, $qty)
+    protected static function playerHasNoteWithComments($gameId, $playerId, $qty)
     {
         $query = "SELECT note_id FROM notes WHERE game_id = '{$gameId}' AND owner_id = '{$playerId}' AND incomplete = '0'";
         $result = Module::query($query);
@@ -438,7 +438,7 @@ abstract class Module extends Utils
         return false;
     }
 
-    protected function playerHasNoteWithLikes($gameId, $playerId, $qty)
+    protected static function playerHasNoteWithLikes($gameId, $playerId, $qty)
     {
         $query = "SELECT note_id FROM notes WHERE game_id = '{$gameId}' AND owner_id = '{$playerId}' AND incomplete = '0'";
         $result = Module::query($query);
@@ -451,7 +451,7 @@ abstract class Module extends Utils
         return false;
     }
 
-    protected function playerHasGivenNoteComments($gameId, $playerId, $qty)
+    protected static function playerHasGivenNoteComments($gameId, $playerId, $qty)
     {
         $query = "SELECT note_id FROM notes WHERE owner_id = '{$playerId}' AND parent_note_id != 0";
         $result = Module::query($query);
@@ -459,7 +459,7 @@ abstract class Module extends Utils
         return false;
     }
 
-    protected function objectMeetsRequirements ($gameId, $playerId, $strObjectType, $intObjectId)
+    protected static function objectMeetsRequirements ($gameId, $playerId, $strObjectType, $intObjectId)
     {		
         //Fetch the requirements
         $query = "SELECT requirement,
@@ -567,7 +567,7 @@ abstract class Module extends Utils
         else                     return false;
     }	
 
-    protected function applyPlayerStateChanges($gameId, $playerId, $strEventType, $strEventDetail)
+    protected static function applyPlayerStateChanges($gameId, $playerId, $strEventType, $strEventDetail)
     {	
         $changeMade = false;
 
@@ -602,7 +602,7 @@ abstract class Module extends Utils
      * All Events are to come through this gateway-
      * Takes events and appends them to the log, completes quests, and fires off webhooks accordingly
      */
-    protected function processGameEvent($playerId, $gameId, $eventType, $eventDetail1='N/A', $eventDetail2='N/A', $eventDetail3='N/A', $eventDetail4='N/A')
+    protected static function processGameEvent($playerId, $gameId, $eventType, $eventDetail1='N/A', $eventDetail2='N/A', $eventDetail3='N/A', $eventDetail4='N/A')
     {
         //Module::serverErrorLog("Module::processGameEvent: playerId:$playerId, gameId:$gameId, eventType:$eventType, eventDetail1:$eventDetail1, eventDetail2:$eventDetail2, eventDetail3:$eventDetail3, eventDetail4:$eventDetail4");
         Module::appendLog($playerId, $gameId, $eventType, $eventDetail1, $eventDetail2, $eventDetail3);
@@ -657,7 +657,7 @@ abstract class Module extends Utils
             Module::checkSpawnablesForDeletion($gameId, $eventDetail2, $type, $eventDetail1);
     }
 
-    protected function checkSpawnablesForDeletion($gameId, $locationId, $type, $typeId)
+    protected static function checkSpawnablesForDeletion($gameId, $locationId, $type, $typeId)
     {
         //Clean up spawnables that ought to be removed after viewing
         $query = "SELECT * FROM spawnables WHERE game_id = $gameId AND active = 1 AND type = '$type' AND type_id = $typeId LIMIT 1";
@@ -670,13 +670,13 @@ abstract class Module extends Utils
         }
     }
 
-    protected function appendLog($playerId, $gameId, $eventType, $eventDetail1='N/A', $eventDetail2='N/A', $eventDetail3='N/A')
+    protected static function appendLog($playerId, $gameId, $eventType, $eventDetail1='N/A', $eventDetail2='N/A', $eventDetail3='N/A')
     {
         $query = "INSERT INTO player_log (player_id, game_id, event_type, event_detail_1, event_detail_2, event_detail_3) VALUES ({$playerId},{$gameId},'{$eventType}','{$eventDetail1}','{$eventDetail2}','{$eventDetail3}')";
         Module::query($query);
     }
 
-    protected function getUnfinishedQuests($playerId, $gameId)
+    protected static function getUnfinishedQuests($playerId, $gameId)
     {
         //Get all quests for game
         $query = "SELECT * FROM quests WHERE game_id = '{$gameId}'";
@@ -709,7 +709,7 @@ abstract class Module extends Utils
         return $unfinishedQuests;	
     }
 
-    protected function getUnfiredWebhooks($playerId, $gameId)
+    protected static function getUnfiredWebhooks($playerId, $gameId)
     {
         //Get all webhooks for game
         $query = "SELECT * FROM web_hooks WHERE game_id = '{$gameId}' AND incoming = 0";
@@ -740,17 +740,17 @@ abstract class Module extends Utils
         return $unfiredWebhooks;	
     }
 
-    protected function questIsCompleted($playerId, $gameId, $questId)
+    protected static function questIsCompleted($playerId, $gameId, $questId)
     {
         return Module::objectMeetsRequirements($gameId, $playerId, 'QuestComplete', $questId);
     }
 
-    protected function hookShouldBeFired($playerId, $gameId, $webhookId)
+    protected static function hookShouldBeFired($playerId, $gameId, $webhookId)
     {
         return Module::objectMeetsRequirements($gameId, $playerId, 'OutgoingWebhook', $webhookId);
     }
 
-    protected function fireOffWebHook($playerId, $gameId, $webHookId)
+    protected static function fireOffWebhook($playerId, $gameId, $webHookId)
     {
         Module::appendLog($playerId, $gameId, "SEND_WEBHOOK", $webHookId);
 

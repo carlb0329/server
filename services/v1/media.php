@@ -12,7 +12,7 @@ class Media extends Module
     protected $validAudioTypes = array('mp3','m4a','caf');
     protected $validVideoTypes = array('mp4','m4v','3gp','mov');
 
-    public function parseRawMedia($media)
+    public static function parseRawMedia($media)
     {
         $media->file_name = $media->file_path; //this is for legacy reasons... Phil 10/12/2012
         $media->thumb_file_path = substr($media->file_path,0,strrpos($media->file_path,'.')).'_128'.substr($media->file_path,strrpos($media->file_path,'.'));
@@ -29,7 +29,7 @@ class Media extends Module
         return $media;
     }
 
-    public function getMedia($gameId)
+    public static function getMedia($gameId)
     {
         $medias = Module::query("SELECT * FROM media WHERE (game_id = '{$gameId}' OR game_id = 0) AND SUBSTRING(file_path,1,1) != 'p'");
 
@@ -39,7 +39,7 @@ class Media extends Module
         return new returnData(0, $data);
     }
 
-    public function getMediaObject($gameId, $mediaId)
+    public static function getMediaObject($gameId, $mediaId)
     {
         //apparently, "is_numeric(NAN)" returns 'true'. NAN literally means "Not A Number". Think about that one for a sec.
         if(!$mediaId || !is_numeric($mediaId) || $mediaId == NAN //return new returnData(2, NULL, "No matching media");
@@ -71,7 +71,7 @@ class Media extends Module
         return new returnData(0, $this->validImageAndIconTypes);
     }
 
-    public function createMedia($gameId, $strName, $strFileName, $boolIsIcon)
+    public static function createMedia($gameId, $strName, $strFileName, $boolIsIcon)
     {
         if($gameId == "player")
         {
@@ -155,7 +155,7 @@ class Media extends Module
         else return new returnData(0, FALSE);	
     }	
 
-    public function getMediaDirectory($gameId)
+    public static function getMediaDirectory($gameId)
     {
         return new returnData(0, Config::gamedataFSPath . "/{$gameId}");
     }
@@ -165,7 +165,7 @@ class Media extends Module
         return new returnData(0, Config::gamedataWWWPath . "/{$gameId}");
     }	
 
-    public function getMediaType($strMediaFileName)
+    public static function getMediaType($strMediaFileName)
     {
         $mediaParts = pathinfo($strMediaFileName);
         $mediaExtension = $mediaParts['extension'];
@@ -181,7 +181,7 @@ class Media extends Module
         return '';
     }	
 
-    public function createMediaFromJSON($glob)
+    public static function createMediaFromJSON($glob)
     {
         $path     = $glob->path;
         $filename = $glob->filename;

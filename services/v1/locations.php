@@ -62,7 +62,7 @@ class Locations extends Module
         return new returnData(0);
     }
 
-    private function generateDescriptors($mediaId, $gameId) {
+    private static function generateDescriptors($mediaId, $gameId) {
         //Get the filename for the media
         if ($mediaId) {
             $query = "SELECT file_path FROM media WHERE media_id = '{$mediaId}' LIMIT 1";
@@ -301,7 +301,7 @@ class Locations extends Module
                     $result = Module::query("SELECT DISTINCT player_id FROM player_log WHERE game_id = $gameId AND deleted = 0 AND timestamp >= NOW() - INTERVAL 20 MINUTE");
                     $spawnable->amount *= mysql_num_rows($result);
                 }
-                $radius = Module::mToDeg($spawnable->max_area);
+                $radius = Utils::mToDeg($spawnable->max_area);
                 $result = Module::query("SELECT * FROM locations WHERE game_id = $gameId AND type = '".$spawnable->type."' AND type_id = ".$spawnable->type_id." AND latitude < ".($lat+$radius)." AND latitude > ".($lat-$radius)." AND longitude < ".($lon+$radius)." AND longitude > ".($lon-$radius));
                 $numLocs = mysql_num_rows($result);
             }
@@ -363,7 +363,7 @@ class Locations extends Module
         return new returnData(0, $arrayLocations);
     }
 
-    public function getLocation($gameId, $intLocationId)
+    public static function getLocation($gameId, $intLocationId)
     {
         $query = "SELECT * FROM locations WHERE game_id = {$gameId} AND location_id = {$intLocationId} LIMIT 1";
 
@@ -385,7 +385,7 @@ class Locations extends Module
                 $intQuantity, $boolHidden, $boolForceView, $boolAllowQuickTravel, $boolAllowWiggle, $boolDisplayAnnotation, $qrCode = '', 0);
     }
 
-    public function createLocationWithQrCode($gameId, $strLocationName, $intIconMediaId, 
+    public static function createLocationWithQrCode($gameId, $strLocationName, $intIconMediaId, 
             $dblLatitude, $dblLongitude, $dblError,
             $strObjectType, $intObjectId,
             $intQuantity, $boolHidden, $boolForceView, $boolAllowQuickTravel, $boolAllowWiggle, $boolDisplayAnnotation, $qrCode = '', $imageMatchId, $errorText)
@@ -546,7 +546,7 @@ class Locations extends Module
         }	
     }
 
-    public function deleteLocationsForObject($gameId, $strObjectType, $intObjectId)
+    public static function deleteLocationsForObject($gameId, $strObjectType, $intObjectId)
     {
         //Check the object Type is good or null
         if ( !Locations::isValidObjectType($strObjectType) or !strlen($strObjectType) > 0 )
@@ -578,13 +578,13 @@ class Locations extends Module
         return new returnData(0, $options);
     }
 
-    private function isValidObjectType($strObjectType)
+    private static function isValidObjectType($strObjectType)
     {
         $validTypes = Locations::lookupObjectTypeOptionsFromSQL();
         return in_array($strObjectType, $validTypes);
     }
 
-    private function lookupObjectTypeOptionsFromSQL()
+    private static function lookupObjectTypeOptionsFromSQL()
     {
         $query = "SHOW COLUMNS FROM locations LIKE 'type'";
         $result = Module::query( $query );

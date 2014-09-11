@@ -42,7 +42,7 @@ class Requirements extends Module
         $glob = json_decode($data);
         return Requirements::createRequirementPackage($glob);
     }
-    public function createRequirementPackage($pack)
+    public static function createRequirementPackage($pack)
     {
         if(!$pack || !$pack->game_id) return "nope";
 
@@ -70,7 +70,7 @@ class Requirements extends Module
     }
 
     //requires game_id and requirement_root_package_id
-    public function createRequirementAndPackage($pack)
+    public static function createRequirementAndPackage($pack)
     {
         if(!$pack || !$pack->game_id || !$pack->requirement_root_package_id) return;
 
@@ -98,7 +98,7 @@ class Requirements extends Module
     }
 
     //requires game_id and requirement_and_package_id
-    public function createRequirementAtom($pack)
+    public static function createRequirementAtom($pack)
     {
         if(!$pack || !$pack->game_id || !$pack->requirement_and_package_id) return;
 
@@ -134,7 +134,7 @@ class Requirements extends Module
         return Requirements::updateRequirementPackage($glob);
     }
 
-    public function updateRequirementPackage($pack)
+    public static function updateRequirementPackage($pack)
     {
         if(!$pack || !$pack->game_id || !$pack->requirement_root_package_id) return;
 
@@ -178,7 +178,7 @@ class Requirements extends Module
         return Requirements::getRequirementPackage($pack->requirement_root_package_id);
     }
 
-    public function updateRequirementAndPackage($pack)
+    public static function updateRequirementAndPackage($pack)
     {
         if(!$pack || !$pack->game_id || !$pack->requirement_and_package_id) return;
 
@@ -220,7 +220,7 @@ class Requirements extends Module
         }
     }
 
-    public function updateRequirementAtom($pack)
+    public static function updateRequirementAtom($pack)
     {
         if(!$pack || !$pack->game_id || !$pack->requirement_atom_id) return;
 
@@ -238,7 +238,7 @@ class Requirements extends Module
     }
 
 
-    public function getRequirementPackage($requirementPackageId)
+    public static function getRequirementPackage($requirementPackageId)
     {
         $pack = new stdClass();
 
@@ -260,7 +260,7 @@ class Requirements extends Module
 
         return $pack;
     }
-    public function getRequirementAndPackage($requirementAndPackageId)
+    public static function getRequirementAndPackage($requirementAndPackageId)
     {
         $sql_andPack = Module::queryObject("SELECT * FROM requirement_and_packages WHERE requirement_and_package_id = '{$requirementAndPackageId}'");
         $andPack = new stdClass();
@@ -281,7 +281,7 @@ class Requirements extends Module
 
         return $andPack;
     }
-    public function getRequirementAtom($requirementAtomId)
+    public static function getRequirementAtom($requirementAtomId)
     {
         $sql_atom = Module::queryObject("SELECT * FROM requirement_atoms WHERE requirement_atom_id = '{$requirementAtomId}'");
         $atom = new stdClass();
@@ -312,7 +312,7 @@ class Requirements extends Module
         Module::query("UPDATE overlays SET requirement_package_id = 0 WHERE game_id = '{$gameId}' AND requirement_package_id = '{$requirementPackageId}'");
     }
 
-    public function deleteRequirementAndPackage($requirementAndPackageId)
+    public static function deleteRequirementAndPackage($requirementAndPackageId)
     {
         $sql_packAtoms = Module::queryArray("SELECT * FROM requirement_atoms WHERE requirement_and_package_id = '{$requirementAndPackageId}'");
         for($i = 0; $i < count($sql_packAtoms); $i++)
@@ -320,7 +320,7 @@ class Requirements extends Module
         Module::query("DELETE FROM requirement_and_packages WHERE requirement_and_package_id = '{$requirementAndPackageId}'");
     }
 
-    public function deleteRequirementAtom($requirementAtomId)
+    public static function deleteRequirementAtom($requirementAtomId)
     {
         Module::query("DELETE FROM requirement_atoms WHERE requirement_atom_id = '{$requirementAtomId}'");
     }
@@ -334,7 +334,7 @@ class Requirements extends Module
         return false;
     }
 
-    public function evaluateRequirementAndPackage($requirementAndPackageId, $playerId)
+    public static function evaluateRequirementAndPackage($requirementAndPackageId, $playerId)
     {
         $atoms = Module::queryArray("SELECT requirement_atom_id FROM requirement_atoms WHERE requirement_and_package_id= '{$requirementAndPackageId}'");
 
@@ -343,7 +343,7 @@ class Requirements extends Module
         return true;
     }
 
-    public function evaluateRequirementAtom($requirementAtomId, $playerId)
+    public static function evaluateRequirementAtom($requirementAtomId, $playerId)
     {
         $atom = Module::queryObject("SELECT * FROM requirement_atoms WHERE requirement_atom_id = '{$requirementAtomId}'");
 
@@ -385,7 +385,7 @@ class Requirements extends Module
         for($i = 0; $i < count($reqs); $i++)
             Requirements::migrateReqPack($reqs[$i], $gameId);
     }
-    private function getPackagedRequirementsForGame($gameId)
+    private static function getPackagedRequirementsForGame($gameId)
     {
         $nodereqs          = Requirements::getPackagedRequirementsForGameForType($gameId, 'Node');
         $questdisplayreqs  = Requirements::getPackagedRequirementsForGameForType($gameId, 'QuestDisplay');
@@ -395,7 +395,7 @@ class Requirements extends Module
         $spawnablereqs     = Requirements::getPackagedRequirementsForGameForType($gameId, 'Spawnable');
         return array_merge($nodereqs, $questdisplayreqs, $questcompletereqs, $locationreqs, $webhookreqs, $spawnablereqs);
     }
-    private function getPackagedRequirementsForGameForType($gameId, $type)
+    private static function getPackagedRequirementsForGameForType($gameId, $type)
     {
         $ids = Module::queryArray("SELECT * FROM requirements WHERE game_id = '{$gameId}' AND content_type = '{$type}' GROUP BY content_id;");
 
@@ -405,7 +405,7 @@ class Requirements extends Module
 
         return $reqs;
     }
-    private function getPackagedRequirementsForGameForTypeForId($gameId, $type, $id)
+    private static function getPackagedRequirementsForGameForTypeForId($gameId, $type, $id)
     {
         $pack = new stdClass();
         $pack->type = $type;
@@ -414,7 +414,7 @@ class Requirements extends Module
         $pack->or_reqs  = Module::queryArray("SELECT * FROM requirements WHERE game_id = '{$gameId}' AND content_type = '{$type}' AND content_id = '{$id}' AND boolean_operator = 'OR'");
         return $pack;
     }
-    private function migrateReqPack($pack, $gameId)
+    private static function migrateReqPack($pack, $gameId)
     {
         Module::query("INSERT INTO requirement_root_packages (game_id, name, created) VALUES ('{$gameId}','', CURRENT_TIMESTAMP)");
         $requirement_root_id = mysql_insert_id();
@@ -455,7 +455,7 @@ class Requirements extends Module
                 break;
         }
     }
-    private function migrateReqAtom($atom, $gameId, $req_and_pack_id)
+    private static function migrateReqAtom($atom, $gameId, $req_and_pack_id)
     {
         $content_id = 0;$distance = 0; //often requirement_detail_1
         $qty = 0;                      //often requirement_detail_2
@@ -861,7 +861,7 @@ class Requirements extends Module
         return new returnData(0);
     }	
 
-    public function deleteRequirementsForRequirementObject($gameId, $objectType, $objectId)
+    public static function deleteRequirementsForRequirementObject($gameId, $objectType, $objectId)
     {
         $requirementString = '';
 

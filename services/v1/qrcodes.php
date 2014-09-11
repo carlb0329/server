@@ -214,7 +214,7 @@ class QRCodes extends Module
 
     }	
 
-    public function createQRCode($gameId, $strLinkType, $intLinkId, $strCode = '', $imageMatchId='0', $errorText="This code doesn't mean anything right now. You should come back later.")
+    public static function createQRCode($gameId, $strLinkType, $intLinkId, $strCode = '', $imageMatchId='0', $errorText="This code doesn't mean anything right now. You should come back later.")
     {
         $errorText = addslashes($errorText);
 
@@ -278,7 +278,7 @@ class QRCodes extends Module
         }
     }	
 
-    public function deleteQRCodeCodesForLink($gameId, $strLinkType, $intLinkId)
+    public static function deleteQRCodeCodesForLink($gameId, $strLinkType, $intLinkId)
     {
         $query = "DELETE FROM qrcodes WHERE game_id = {$gameId} AND
             link_type = '{$strLinkType}' AND link_id = '{$intLinkId}'";
@@ -301,7 +301,7 @@ class QRCodes extends Module
         return new returnData(0, $options);
     }	
 
-    private function lookupContentTypeOptionsFromSQL()
+    private static function lookupContentTypeOptionsFromSQL()
     {
         $query = "SHOW COLUMNS FROM qrcodes LIKE 'link_type'";
 
@@ -313,7 +313,7 @@ class QRCodes extends Module
         return( $enum_fields );
     }
 
-    private function isValidObjectType($strObjectType)
+    private static function isValidObjectType($strObjectType)
     {
         $validTypes = QRCodes::lookupContentTypeOptionsFromSQL();
         return in_array($strObjectType, $validTypes);

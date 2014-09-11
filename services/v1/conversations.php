@@ -127,7 +127,7 @@ class Conversations extends Module
 	}	
 
 
-	public function searchGameForErrors($gid){
+	public static function searchGameForErrors($gid){
 
 		//     $query = "SELECT name FROM games WHERE game_id = {$gid}";
 		//     $name = Module::query($query);

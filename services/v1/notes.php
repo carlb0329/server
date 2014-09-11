@@ -52,7 +52,7 @@ class Notes extends Module
 		return new returnData(0);
 	}
 
-	function addContentToNote($noteId, $gameId, $playerId, $mediaId, $type, $text, $title='', $lat=0, $lon=0)
+	static function addContentToNote($noteId, $gameId, $playerId, $mediaId, $type, $text, $title='', $lat=0, $lon=0)
 	{
 		$text = addslashes($text);
 		if($title == '') $title = Date('F jS Y h:i:s A');
@@ -90,7 +90,7 @@ class Notes extends Module
 		return new returnData(0);
 	}
 
-	function deleteNoteContent($contentId)
+	static function deleteNoteContent($contentId)
 	{
 		$query = "DELETE FROM note_content WHERE content_id = '{$contentId}'";
 		Module::query($query);
@@ -299,13 +299,13 @@ class Notes extends Module
 		return new returnData(0, $notes);
 	}
 
-	function getNoteById($noteId, $playerId=0)
+	static function getNoteById($noteId, $playerId=0)
 	{
 		$note = Notes::getFullNoteObject($noteId, $playerId);
 		return new returnData(0, $note);
 	}
 
-	function getFullNoteObject($noteId, $playerId=0)
+	static function getFullNoteObject($noteId, $playerId=0)
 	{
 		$query = "SELECT * FROM notes WHERE note_id = '{$noteId}'";
 		$result = Module::query($query);
@@ -346,7 +346,7 @@ class Notes extends Module
 		return;
 	}
 
-	function getNoteShares($noteId, $type)
+	static function getNoteShares($noteId, $type)
 	{
 		$query = "SELECT COUNT(*) AS shares FROM note_shares WHERE note_id = '{$noteId}' AND share_type = '{$type}'";
 		$result = Module::query($query);
@@ -354,7 +354,7 @@ class Notes extends Module
 		return $resultObj->shares;		
 	}
 
-	function getNoteContents($noteId, $gameId)
+	static function getNoteContents($noteId, $gameId)
 	{
 		$query = "SELECT * FROM note_content WHERE note_id = '{$noteId}'";
 		$result = Module::query($query);
@@ -370,7 +370,7 @@ class Notes extends Module
 		return $contents;
 	}
 
-	function getNoteComments($noteId, $playerId)
+	static function getNoteComments($noteId, $playerId)
 	{
 		$query = "SELECT note_id FROM notes WHERE incomplete = '0' AND parent_note_id = '{$noteId}'";
 		$result = Module::query($query);
@@ -390,7 +390,7 @@ class Notes extends Module
 	//	tag = 'my tag'
 	//	tag_id = 4
 	//	player_created = 0 (if 0, by game author, and potentially used in requirements. if 1, created by some player)
-	function getNoteTags($noteId, $gameId)
+	static function getNoteTags($noteId, $gameId)
 	{
 		$query = "SELECT gt.tag, gt.tag_id, gt.player_created, gt.media_id FROM note_tags LEFT JOIN ((SELECT tag, tag_id, player_created, media_id FROM game_tags WHERE game_id = '{$gameId}') as gt) ON note_tags.tag_id = gt.tag_id WHERE note_id = '{$noteId}'";
 		$result = Module::query($query);
@@ -410,7 +410,7 @@ class Notes extends Module
 			return new returnData(1,NULL,"Tag Not Found");
 	}
 
-	function getNoteLikes($noteId)
+	static function getNoteLikes($noteId)
 	{
 		$query = "SELECT COUNT(*) as numLikes FROM note_likes WHERE note_id = '{$noteId}'";
 		$result  = Module::query($query);
@@ -418,7 +418,7 @@ class Notes extends Module
 		return $likes->numLikes;
 	}
 
-	function playerLiked($playerId, $noteId)
+	static function playerLiked($playerId, $noteId)
 	{
 		$query = "SELECT COUNT(*) as liked FROM note_likes WHERE player_id = '{$playerId}' AND note_id = '{$noteId}' LIMIT 1";
 		$result = Module::query($query);
@@ -426,7 +426,7 @@ class Notes extends Module
 		return $liked->liked;
 	}
 
-	function playerFlagged($playerId, $noteId)
+	static function playerFlagged($playerId, $noteId)
 	{
 		$query = "SELECT COUNT(*) as flagged FROM note_flags WHERE player_id = '{$playerId}' AND note_id = '{$noteId}' LIMIT 1";
 		$result = Module::query($query);
@@ -434,12 +434,12 @@ class Notes extends Module
 		return $flagged->flagged;
 	}
 
-	function noteDropped($noteId, $gameId)
+	static function noteDropped($noteId, $gameId)
 	{
                 return Module::queryObject("SELECT * FROM locations WHERE game_id = {$gameId} AND type='PlayerNote' AND type_id='{$noteId}' LIMIT 1");
 	}
 
-	function getNoteLocation($noteId, $gameId)
+	static function getNoteLocation($noteId, $gameId)
 	{
 		$query = "SELECT * FROM locations WHERE game_id = {$gameId} AND type='PlayerNote' AND type_id='{$noteId}' LIMIT 1";
 		$result = Module::query($query);
@@ -480,7 +480,7 @@ class Notes extends Module
 	//	tag = 'my tag'
 	//	tag_id = 4
 	//	player_created = 0 (0 means tag created by game author, 1 means created by some player, and is instantiated at least once in a note in game)
-	function getGameTags($gameId)
+	static function getGameTags($gameId)
 	{
 		$query = "SELECT tag_id, tag, player_created, media_id from game_tags WHERE game_id = '{$gameId}'";
 		$result = Module::query($query);

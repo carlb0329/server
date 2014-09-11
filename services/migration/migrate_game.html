@@ -64,7 +64,7 @@
         if(!v1_games[i]) return;
         var game = v1_games[i];
 
-        var response = sendRequest('dev.','migration.migration.migrateGame/'+game.game_id+"/"+editor_id+"/"+rw_token, null, "GET");
+        var response = sendRequest('','migration.migration.migrateGame/'+game.game_id+"/"+editor_id+"/"+rw_token, null, "GET");
         if(!response.data) return "NO";
     }
 

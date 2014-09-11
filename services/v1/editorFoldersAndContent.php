@@ -232,7 +232,7 @@ class EditorFoldersAndContent extends Module
         return new returnData(0);
     }
 
-    private function hydrateContent($content, $gameId)
+    private static function hydrateContent($content, $gameId)
     {
         if ($content->content_type == 'Node')
         {

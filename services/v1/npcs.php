@@ -17,7 +17,7 @@ class Npcs extends Module
         return new returnData(0, $rsResult);	
     }
 
-    public function getNpc($gameId, $intNpcId)
+    public static function getNpc($gameId, $intNpcId)
     {
         $query = "SELECT * FROM npcs WHERE game_id = {$gameId} AND npc_id = {$intNpcId} LIMIT 1";
 
@@ -114,7 +114,7 @@ class Npcs extends Module
         else return new returnData(0, FALSE, "");
     }
 
-    public function deleteNpc($gameId, $intNpcId)
+    public static function deleteNpc($gameId, $intNpcId)
     {
         Locations::deleteLocationsForObject($gameId, 'Npc', $intNpcId);
         Requirements::deleteRequirementsForRequirementObject($gameId, 'Npc', $intNpcId);
@@ -154,7 +154,7 @@ class Npcs extends Module
         return new returnData(0, mysql_insert_id());		
     }
 
-    public function getConversations($gameId, $intNpcId)
+    public static function getConversations($gameId, $intNpcId)
     {
         $query = "SELECT * FROM npc_conversations WHERE game_id = {$gameId} AND npc_id = '{$intNpcId}' ORDER BY sort_index";
 
@@ -164,7 +164,7 @@ class Npcs extends Module
         return new returnData(0, $rsResult);		
     }	
 
-    public function getConversationsForPlayer($gameId, $intNpcId, $intPlayerId)
+    public static function getConversationsForPlayer($gameId, $intNpcId, $intPlayerId)
     {
         $conversationsReturnData= Npcs::getConversations($gameId, $intNpcId);	
         $conversations = $conversationsReturnData->data;

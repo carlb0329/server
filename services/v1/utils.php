@@ -3,10 +3,10 @@ require_once('/var/www/html/server/config.class.php');
 
 abstract class Utils
 {
-	protected function connect()
+	protected static function connect()
 	{
-		$this->conn = @mysql_connect(Config::v1_host, Config::v1_db_user, Config::v1_db_pass);
-		if (!$this->conn)
+		$conn = @mysql_connect(Config::v1_host, Config::v1_db_user, Config::v1_db_pass);
+		if (!$conn)
 		{
 			Utils::serverErrorLog("Problem Connecting to MySQL: " . mysql_error());
 			if(Config::adminEmail) Utils::sendEmail(Config::adminEmail,"ARIS Server Error", mysql_error());
@@ -14,7 +14,7 @@ abstract class Utils
 		mysql_set_charset('utf8');
 	}
 
-	protected function query($query)
+	protected static function query($query)
 	{
 		Utils::serverErrorLog("DCONNETION");
 		mysql_select_db(Config::v1_db);
@@ -33,14 +33,14 @@ abstract class Utils
 		return $r;
 	}
 
-	protected function queryObject($query)
+	protected static function queryObject($query)
 	{
 		if($r = Utils::query($query))
 			return mysql_fetch_object($r);
 		return new stdClass();
 	}
 
-	protected function queryArray($query)
+	protected static function queryArray($query)
 	{
 		if($r = Utils::query($query))
 		{
@@ -100,7 +100,7 @@ abstract class Utils
 		return null;
 	}
 
-	protected function serverErrorLog($message)
+	protected static function serverErrorLog($message)
 	{
 		$errorLogFile = fopen(Config::serverErrorLog, "a");
 		$errorData = date('c').":\nRequest:\n"."http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"."\n".$message."\n\n";
@@ -108,7 +108,7 @@ abstract class Utils
 		fclose($errorLogFile);
 	}
 
-	protected function sendEmail($to, $subject, $body)
+	protected static function sendEmail($to, $subject, $body)
 	{
 		include_once('../../libraries/phpmailer/class.phpmailer.php');
 
@@ -131,7 +131,7 @@ abstract class Utils
 		else return false;
 	}
 
-	protected function mToDeg($meters) // lat/lon ^ -> meters
+	protected static function mToDeg($meters) // lat/lon ^ -> meters
 	{
 		return $meters/80000; //Ridiculous approximation, but fine for most cases
 	}
@@ -142,7 +142,7 @@ abstract class Utils
 	}
 
 	/* stolen from http://www.lateralcode.com/creating-a-random-string-with-php/ */
-	protected function rand_string($length) 
+	protected static function rand_string($length) 
 	{
 		$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";  
 		$size = strlen($chars);

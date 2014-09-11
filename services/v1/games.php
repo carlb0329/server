@@ -144,7 +144,7 @@ class Games extends Module
         return new returnData(0);
     }
 
-    public function getFullGameObject($gameId, $playerId, $boolGetLocationalInfo = 0, $intSkipAtDistance = 99999999, $latitude = 0, $longitude = 0)
+    public static function getFullGameObject($gameId, $playerId, $boolGetLocationalInfo = 0, $intSkipAtDistance = 99999999, $latitude = 0, $longitude = 0)
     {
         $gameObj = Module::queryObject("SELECT * FROM games WHERE game_id = '{$gameId}' LIMIT 1");
 
@@ -545,7 +545,7 @@ class Games extends Module
         return new returnData(0, $games);
     }
 
-    protected function getNearestLocationOfGameToUser($latitude, $longitude, $gameId)
+    protected static function getNearestLocationOfGameToUser($latitude, $longitude, $gameId)
     {
         $query = "SELECT latitude, longitude,((ACOS(SIN($latitude * PI() / 180) * SIN(latitude * PI() / 180) + 
             COS($latitude * PI() / 180) * COS(latitude * PI() / 180) * 

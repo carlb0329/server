@@ -64,7 +64,7 @@ class Players extends Module
 	 * Should be the new way to log in. The above function doesn't return a robust, expandible, json package. It returns just an int.
 	 * Because of this, the parsers using it try to parse an int directly from the return data, disallowing the attachment of more data.
 	 */
-	public function getLoginPlayerObject($strUser,$strPassword)
+	public static function getLoginPlayerObject($strUser,$strPassword)
 	{
 		$query = "SELECT player_id, user_name, display_name, media_id FROM players 
 			WHERE user_name = '{$strUser}' and password = MD5('{$strPassword}') AND facebook_id = '0' LIMIT 1";
@@ -95,7 +95,7 @@ class Players extends Module
 		return new returnData(0, $player);
 	}
 
-	public function createFacebookPlayer($email, $displayName, $fbId)
+	public static function createFacebookPlayer($email, $displayName, $fbId)
 	{
 		$email       = addslashes($email);	
 		$displayName = addslashes($displayName);	
@@ -113,13 +113,13 @@ class Players extends Module
 		return new returnData(0, $playerId);
 	}
 
-	public function createPlayerAndGetLoginPlayerObject($strGroup)
+	public static function createPlayerAndGetLoginPlayerObject($strGroup)
 	{
 		$newPlayer->returnCode = 1;
 		$userName;
 		while($newPlayer->returnCode == 1)
 		{
-			$userName = $strGroup."_".Players::rand_string(5);
+			$userName = $strGroup."_".Utils::rand_string(5);
 			$newPlayer = Players::createPlayer($userName, $strGroup, $strGroup."-player", '', '', $strGroup);
 		}
 
@@ -142,7 +142,7 @@ class Players extends Module
 		else return new returnData(0, FALSE);
 	}	
 
-	function addPlayerPicFromFileName($playerId, $filename, $name)
+	static function addPlayerPicFromFileName($playerId, $filename, $name)
 	{
 		if(!$name) $name = $playerId."_player_pic";
 		$newMediaResultData = Media::createMedia("player", $name, $filename, 0);
@@ -152,7 +152,7 @@ class Players extends Module
 		return new returnData(0,$returnObj);
 	}
 
-	function addPlayerPic($playerId, $mediaId)
+	static function addPlayerPic($playerId, $mediaId)
 	{
 		Module::query("UPDATE players SET media_id = {$mediaId} WHERE player_id = {$playerId}");
 		return new returnData(0);
@@ -233,7 +233,7 @@ class Players extends Module
 		else return new returnData(0, FALSE);
 	}
 
-	public function nodeViewed($gameId, $playerId, $intNodeId, $intLocationId = 0)
+	public static function nodeViewed($gameId, $playerId, $intNodeId, $intLocationId = 0)
 	{	
 		//Module::applyPlayerStateChanges($gameId, $playerId, Module::kLOG_VIEW_NODE, $intNodeId); //Was causing duplicate playerStateChanges (changed 5/23/12 Phil)
 		Module::processGameEvent($playerId, $gameId, Module::kLOG_VIEW_NODE, $intNodeId, $intLocationId);
@@ -241,7 +241,7 @@ class Players extends Module
 		return new returnData(0, TRUE);
 	}
 
-	public function setItemCountForPlayerJSON($obj)
+	public static function setItemCountForPlayerJSON($obj)
 	{
 		$gameId = $obj['gameId'];
 		$itemId = $obj['itemId'];
@@ -251,7 +251,7 @@ class Players extends Module
 		Module::setItemCountForPlayer($gameId, $itemId, $playerId, $qty);
 	}
 
-	public function setItemCountForPlayer($gameId, $itemId, $playerId, $qty)
+	public static function setItemCountForPlayer($gameId, $itemId, $playerId, $qty)
 	{
 		$rData = Module::setItemCountForPlayer($gameId, $itemId, $playerId, $qty);
 		if(!$rData->returnCode)
@@ -260,7 +260,7 @@ class Players extends Module
 			return $rData;
 	}
 
-	public function giveItemToPlayer($gameId, $itemId, $playerId, $qtyToGive=1) 
+	public static function giveItemToPlayer($gameId, $itemId, $playerId, $qtyToGive=1) 
 	{
 		$rData = Module::giveItemToPlayer($gameId, $itemId, $playerId, $qtyToGive=1);
 		if(!$rData->returnCode)
@@ -269,7 +269,7 @@ class Players extends Module
 			return $rData;
 	}
 
-	public function takeItemFromPlayer($gameId, $itemId, $playerId, $qtyToGive=1) 
+	public static function takeItemFromPlayer($gameId, $itemId, $playerId, $qtyToGive=1) 
 	{
 		$rData = Module::takeItemFromPlayer($gameId, $itemId, $playerId, $qtyToGive=1);
 		if(!$rData->returnCode)
@@ -353,7 +353,7 @@ class Players extends Module
 		return new returnData(0, FALSE);
 	}		
 
-	public function dropNote($gameId, $playerId, $noteId, $floatLat, $floatLong)
+	public static function dropNote($gameId, $playerId, $noteId, $floatLat, $floatLong)
 	{
 		Module::giveNoteToWorld($gameId, $noteId, $floatLat, $floatLong);
 
@@ -832,7 +832,7 @@ class Players extends Module
 		return new returnData(0,$log);
 	}
 
-        protected function giveItemToWorld($gameId, $itemId, $floatLat, $floatLong, $intQty = 1)
+        protected static function giveItemToWorld($gameId, $itemId, $floatLat, $floatLong, $intQty = 1)
         {
             $clumpingRangeInMeters = 10;
 
